@@ -16,20 +16,20 @@ Description and general comments go here.
  #### Windows:
  1. git: Github Desktop is the recommended git gui, however GitKraken also seems nice. If you want to use the command line, I recommend git-scm. Or just use Visual Studio code as an editor, it has git integration.
  2. python: Install python with Anaconda. You can also use the python_env.yml file in this folder to set up the virtual environment with the right packages. Anaconda comes with python editors as well, use jupyter for the .ipynb files and spyder for the .py files.
- 3. ssh-key: Github only lets you push to a repo if you have an ssh key. Unforunately this has to be generated in the commandline. Open the command line and ...
-    run either:
-    $ ssh-keygen
-    or
-    $ ssh-keygen
+ 3. ssh-key: Github only lets you push to a repo if you have an ssh key. Unforunately this has to be generated in the commandline. Open the command line and ...\
+    run either:\
+    $ ssh-keygen\
+    or\
+    $ ssh-keygen\
     Importantly in Windows the keygen command bugs out for the folder format, and the default file name and location it offers will not work (due to the other slash /). Type instead: C:\Users\<YourName>\.ssh\id_rsa
     Go to the .ssh folder, keep the id_rsa key private, it's your private key! Open the id_rsa.pub (public key) file and copy paste the content to the SSH Key Section your Github Settings. Your Github Desktop application should see the key automatically.
 
  #### Linux 
  1. git: If you're using linux, you probably know git and use it in the command line.
  2. python: I recommend not using the system python, but use a virtual environment manager, to not get into version conflitcs etc. Anaconda or PIP are two alternatives and the yml file can be used to load the packages that were used in this code.
- 3. ssh-key: run
-    $ ssh-keygen
-    you can leave the passphrase empty.
+ 3. ssh-key: run\
+    $ ssh-keygen\
+    you can leave the passphrase empty.\
 
  #### Actual installation
  Clone the repo. This repo also contain a submodule. It points to the BalancingControl repo which contains the Bayesian behavioral agent used in this analysis. This repo keeps track of which commit itself points to. You can either just use it as is, or even set it up in a way that you can change that code from within this repo, and commit and push from here. Then you also have to tell git that the top repo should point to a new commit, by adding the folder and commiting and pushing it as any other change.
