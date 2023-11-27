@@ -17,10 +17,9 @@ Description and general comments go here.
  1. git: Github Desktop is the recommended git gui, however GitKraken also seems nice. If you want to use the command line, I recommend git-scm. Or just use Visual Studio code as an editor, it has git integration.
  2. python: Install python with Anaconda. You can also use the python_env.yml file in this folder to set up the virtual environment with the right packages. Anaconda comes with python editors as well, use jupyter for the .ipynb files and spyder for the .py files.
  3. ssh-key: Github only lets you push to a repo if you have an ssh key. Unforunately this has to be generated in the commandline. Open the command line and ...\
-    run either:\
-    $ ssh-keygen\
-    or\
-    $ ssh-keygen\
+    Run:\
+    $ git config --global core.sshCommand "'C:\Windows\System32\OpenSSH\ssh.exe'" \
+    $ ssh-keygen
     Importantly in Windows the keygen command bugs out for the folder format, and the default file name and location it offers will not work (due to the other slash /). Type instead: C:\Users\YourName\ .ssh\id_rsa
     Go to the .ssh folder, keep the id_rsa key private, it's your private key! Open the id_rsa.pub (public key) file and copy paste the content to the SSH Key Section your Github Settings. Your Github Desktop application should see the key automatically.
 
