@@ -19,7 +19,7 @@ Description and general comments go here.
  3. ssh-key: Github only lets you push to a repo if you have an ssh key. Unforunately this has to be generated in the commandline. Open the command line and ...\
     Run:\
     $ git config --global core.sshCommand "'C:\Windows\System32\OpenSSH\ssh.exe'" \
-    $ ssh-keygen
+    $ ssh-keygen\
     Importantly in Windows the keygen command bugs out for the folder format, and the default file name and location it offers will not work (due to the other slash /). Type instead: C:\Users\YourName\ .ssh\id_rsa
     Go to the .ssh folder, keep the id_rsa key private, it's your private key! Open the id_rsa.pub (public key) file and copy paste the content to the SSH Key Section your Github Settings. Your Github Desktop application should see the key automatically.
 
