@@ -7482,17 +7482,18 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Alanyze-data-using-behavioral-model">Alanyze data using behavioral model<a class="anchor-link" href="#Alanyze-data-using-behavioral-model">¶</a></h1><p>There are 3 models with different parameter combinations:}</p>
+<h1 id="Alanyze-data-using-behavioral-model">Alanyze data using behavioral model<a class="anchor-link" href="#Alanyze-data-using-behavioral-model">¶</a></h1><p>There are 3 models with different parameter combinations:</p>
 <ol>
 <li><b>The Bayesian model (Schwöbel et al. 2021):</b> <br/>
 <b>a.</b> With 3 parameters: a policy forgetting rate $\lambda_{\pi}$, a reward forgetting rate $\lambda_{r}$, and a decision temparature $\beta$. <br/>
 <b>b.</b> With 4 parameters: a policy forgetting rate $\lambda_{\pi}$, a reward forgetting rate $\lambda_{r}$, a decision temparature $\beta$, and a habitual tendency $h$.</li>
+<li><b>A newer MF/MB version that is better for fitting (Otto et al. 2013):</b> <br/>
+<b>Note:</b> This is not quite the original version, as the Q-values in the original work did not converge to the true expected values. Instead, I implemented a "bug-fixed" version.<br/>
+<b>a.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
+<b>b.</b> With 5 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$$, and a repetition/perserveration parameter $p$. \</li>
 <li><b>The original model-free/model-based (MF/MB) model (Daw et al. 2005, 2011):</b> <br/>
 <b>a.</b> With 4 parameters: a weighting parameters $\omega$, a decision temperature $\beta$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
 <b>b.</b> With 5 parameters: a weighting parameter $\omega$, a decision temperature $\beta$, a learning rate $\alpha$, a dicount factor $\lambda$, and a repetition/perserveration parameter $p$.</li>
-<li><b>A newer MF/MB version that is better for fitting (Otto et al. 2013):</b> <br/>
-<b>a.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
-<b>b.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$.</li>
 </ol>
 </div>
 </div>

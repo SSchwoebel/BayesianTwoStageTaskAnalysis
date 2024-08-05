@@ -7487,12 +7487,13 @@ a.anchor-link {
 <li><b>The Bayesian model (Schwöbel et al. 2021):</b> <br/>
 <b>a.</b> With 3 parameters: a policy forgetting rate $\lambda_{\pi}$, a reward forgetting rate $\lambda_{r}$, and a decision temparature $\beta$. <br/>
 <b>b.</b> With 4 parameters: a policy forgetting rate $\lambda_{\pi}$, a reward forgetting rate $\lambda_{r}$, a decision temparature $\beta$, and a habitual tendency $h$.</li>
+<li><b>A newer MF/MB version that is better for fitting (Otto et al. 2013):</b> <br/>
+<b>Note:</b> This is not quite the original version, as the Q-values in the original work did not converge to the true expected values. Instead, I implemented a "bug-fixed" version.<br/>
+<b>a.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
+<b>b.</b> With 5 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$$, and a repetition/perserveration parameter $p$. \</li>
 <li><b>The original model-free/model-based (MF/MB) model (Daw et al. 2005, 2011):</b> <br/>
 <b>a.</b> With 4 parameters: a weighting parameters $\omega$, a decision temperature $\beta$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
 <b>b.</b> With 5 parameters: a weighting parameter $\omega$, a decision temperature $\beta$, a learning rate $\alpha$, a dicount factor $\lambda$, and a repetition/perserveration parameter $p$.</li>
-<li><b>A newer MF/MB version that is better for fitting (Otto et al. 2013):</b> <br/>
-<b>a.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
-<b>b.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$.</li>
 </ol>
 </div>
 </div>
@@ -7568,9 +7569,9 @@ Running on device cpu
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">jsonpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
 </pre></div>
 </div>
 </div>
@@ -7623,6 +7624,10 @@ Running on device cpu
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">results_folder</span> <span class="o">=</span> <span class="s2">"results"</span>
 <span class="n">simulation_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_folder</span><span class="p">,</span> <span class="s2">"simulations"</span><span class="p">)</span>
 <span class="n">recovery_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_folder</span><span class="p">,</span> <span class="s2">"recovery"</span><span class="p">)</span>
+
+<span class="n">mask_file_name</span> <span class="o">=</span> <span class="s2">"mask.txt"</span>
+<span class="n">processed_data_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_folder</span><span class="p">,</span> <span class="s2">"processed_data"</span><span class="p">)</span>
+<span class="n">mask_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">processed_data_folder</span><span class="p">,</span> <span class="n">mask_file_name</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7673,10 +7678,15 @@ Running on device cpu
 <span class="n">never_reward</span> <span class="o">=</span> <span class="n">ns</span><span class="o">-</span><span class="n">nb</span> <span class="c1"># states that dont generate rewards</span>
 
 <span class="c1"># prob for invalid answer (e.g. no reply). Same frequency as in the real data</span>
-<span class="n">p_invalid</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="mf">201.</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mask_file</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">all_mask</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="c1"># simulations will be done with the same missing actions as in the data.</span>
+<span class="n">exp_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">all_mask</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">p_valid</span> <span class="o">=</span> <span class="n">exp_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="p">(</span><span class="n">exp_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">exp_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p_valid</span><span class="p">)</span>
 
 <span class="c1"># make global parameter dict:</span>
-<span class="n">global_experiment_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"trials"</span><span class="p">:</span> <span class="n">trials</span><span class="p">,</span> <span class="s2">"T"</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="s2">"nb"</span><span class="p">:</span> <span class="n">nb</span><span class="p">,</span> <span class="s2">"ns"</span><span class="p">:</span> <span class="n">ns</span><span class="p">,</span> <span class="s2">"no"</span><span class="p">:</span> <span class="n">no</span><span class="p">,</span> <span class="s2">"na"</span><span class="p">:</span> <span class="n">na</span><span class="p">,</span> <span class="s2">"npi"</span><span class="p">:</span> <span class="n">npi</span><span class="p">,</span> <span class="s2">"nr"</span><span class="p">:</span> <span class="n">nr</span><span class="p">,</span> <span class="s2">"never_reward"</span><span class="p">:</span> <span class="n">never_reward</span><span class="p">,</span> <span class="s2">"p_invalid"</span><span class="p">:</span> <span class="n">p_invalid</span><span class="p">}</span>
+<span class="n">global_experiment_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"trials"</span><span class="p">:</span> <span class="n">trials</span><span class="p">,</span> <span class="s2">"T"</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="s2">"nb"</span><span class="p">:</span> <span class="n">nb</span><span class="p">,</span> <span class="s2">"ns"</span><span class="p">:</span> <span class="n">ns</span><span class="p">,</span> <span class="s2">"no"</span><span class="p">:</span> <span class="n">no</span><span class="p">,</span> <span class="s2">"na"</span><span class="p">:</span> <span class="n">na</span><span class="p">,</span> <span class="s2">"npi"</span><span class="p">:</span> <span class="n">npi</span><span class="p">,</span> <span class="s2">"nr"</span><span class="p">:</span> <span class="n">nr</span><span class="p">,</span> <span class="s2">"never_reward"</span><span class="p">:</span> <span class="n">never_reward</span><span class="p">,</span> <span class="s2">"p_invalid"</span><span class="p">:</span> <span class="n">p_valid</span><span class="p">,</span> <span class="s2">"mask"</span><span class="p">:</span> <span class="n">exp_mask</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -7713,20 +7723,20 @@ Running on device cpu
 <span class="n">nb2</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">-</span><span class="n">b2</span>
 
 <span class="n">B</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span> <span class="n">b1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span><span class="n">nb1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,],])</span>
+                         <span class="p">[</span> <span class="n">b1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span><span class="n">nb1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,],])</span>
 
 <span class="n">B</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span><span class="n">nb2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span> <span class="n">b2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
-                      <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,],])</span>
+                         <span class="p">[</span><span class="n">nb2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span> <span class="n">b2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,],</span>
+                         <span class="p">[</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,],])</span>
 
 <span class="c1"># add to parameter dict</span>
 <span class="n">global_experiment_parameters</span><span class="p">[</span><span class="s2">"A"</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span>
@@ -8267,7 +8277,7 @@ true values are:
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6b869bac">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=98cc92af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8307,7 +8317,7 @@ true values are:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f913018a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1a6b0e57">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8317,7 +8327,7 @@ true values are:
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6da26fa0">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9b184e33">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8391,7 +8401,7 @@ true values are:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=be12f045">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1e155edd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8401,7 +8411,7 @@ true values are:
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=bae885d4">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ce01f795">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8449,7 +8459,7 @@ true values are:
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1533a912">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7fe631ec">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

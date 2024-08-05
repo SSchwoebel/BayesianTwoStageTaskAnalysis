@@ -7482,17 +7482,18 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Alanyze-data-using-behavioral-model">Alanyze data using behavioral model<a class="anchor-link" href="#Alanyze-data-using-behavioral-model">¶</a></h1><p>There are 3 models with different parameter combinations:}</p>
+<h1 id="Alanyze-data-using-behavioral-model">Alanyze data using behavioral model<a class="anchor-link" href="#Alanyze-data-using-behavioral-model">¶</a></h1><p>There are 3 models with different parameter combinations:</p>
 <ol>
 <li><b>The Bayesian model (Schwöbel et al. 2021):</b> <br/>
 <b>a.</b> With 3 parameters: a policy forgetting rate $\lambda_{\pi}$, a reward forgetting rate $\lambda_{r}$, and a decision temparature $\beta$. <br/>
 <b>b.</b> With 4 parameters: a policy forgetting rate $\lambda_{\pi}$, a reward forgetting rate $\lambda_{r}$, a decision temparature $\beta$, and a habitual tendency $h$.</li>
+<li><b>A newer MF/MB version that is better for fitting (Otto et al. 2013):</b> <br/>
+<b>Note:</b> This is not quite the original version, as the Q-values in the original work did not converge to the true expected values. Instead, I implemented a "bug-fixed" version.<br/>
+<b>a.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
+<b>b.</b> With 5 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$$, and a repetition/perserveration parameter $p$. \</li>
 <li><b>The original model-free/model-based (MF/MB) model (Daw et al. 2005, 2011):</b> <br/>
 <b>a.</b> With 4 parameters: a weighting parameters $\omega$, a decision temperature $\beta$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
 <b>b.</b> With 5 parameters: a weighting parameter $\omega$, a decision temperature $\beta$, a learning rate $\alpha$, a dicount factor $\lambda$, and a repetition/perserveration parameter $p$.</li>
-<li><b>A newer MF/MB version that is better for fitting (Otto et al. 2013):</b> <br/>
-<b>a.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$. <br/>
-<b>b.</b> With 4 parameters: a MF weight parameter $\beta_{MF}$, a MB weight parameter $\beta_{MB}$, a learning rate $\alpha$, and a dicount factor $\lambda$.</li>
 </ol>
 </div>
 </div>
@@ -8149,7 +8150,7 @@ possible rewards3 tensor([0., 1.], dtype=torch.float64)
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cd445967">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=334bc9ed">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8189,7 +8190,7 @@ possible rewards3 tensor([0., 1.], dtype=torch.float64)
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6a8c33cc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8b771bd0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8199,7 +8200,7 @@ possible rewards3 tensor([0., 1.], dtype=torch.float64)
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2e1b2e22">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d04b37c3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8293,7 +8294,7 @@ possible rewards3 tensor([0., 1.], dtype=torch.float64)
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ca173eee">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=08c7511b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8303,7 +8304,7 @@ possible rewards3 tensor([0., 1.], dtype=torch.float64)
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c4bd069b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0f8fd3c8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8378,7 +8379,7 @@ possible rewards3 tensor([0., 1.], dtype=torch.float64)
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0fd1f7d4">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7f07dcf2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
