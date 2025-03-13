@@ -1,8 +1,8 @@
 # custom
-raw_data/*
-!raw_data/readme.txt
+*/raw_data/*
+!*/raw_data/readme.txt
 
-experiment/experiment_code
+*/experiment/experiment_code
 
 
 # Byte-compiled / optimized / DLL files
